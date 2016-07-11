@@ -6,18 +6,52 @@ namespace MXSPyCOM
 {
 	class Program
 	{
-		/// <summary>
+		/// A modern version of MXSCOM, to allow for editing & execution of 3ds Max MaxScript and Python files from external code editors.
+		/// In 2005 Simon Feltman released the first MXSCOM, a small Visual Basic 6 application that took commands and sent them to 
+		/// Autodesk's 3ds Max's internal COM server. This allowed users to choose their own external code editor for editing MaxScript 
+		/// and to be able to have their MaxScript code execute in 3ds Max by way of having the code editor utilize MXSCOM to send the file 
+		/// into 3ds Max and have it executed. Modern versions of Windows can not use Simon Feltman's old MXSCOM.exe program due to it being ActiveX based.
 		/// 
-		/// </summary>
+		/// MXSPyCOM is a C# based replacement for MXSCOM. It offers the same functionality as MXSCOM but can run on modern versions of Windows. 
+		/// It also supports editing of Python files and having them execute in versions of 3ds Max, starting with 3ds Max 2015, that support Python scripts.
 		/// 
+		/// **Arguments:**
+		/// 
+		/// None
+		/// 
+		/// **Keyword Arguments:**
+		///
+		/// None
+		/// 
+		/// **TODO**
+		/// 
+		/// :Add the ability to start 3ds Max if it is not found as a running process.
+		/// 
+		/// **Author:**
+		/// 
+		/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
+
 		const string USAGE_INFO = "Type \"MXSPyCOM /?\" for usage info.";
 
 		static bool is_process_running(string process_name)
 		{
-			/// <summary>
+			/// Determines if a named process is currently running.
 			/// 
-			/// </summary>
+			/// **Arguments:**
 			/// 
+			/// :``process_name``: `string` The name of the process (minus the .exe extension) to check
+			/// 
+			/// **Keyword Arguments:**
+			///
+			/// None
+			/// 
+			/// **Returns:**
+			/// 
+			/// :`bool`
+			/// 
+			/// **Author:**
+			/// 
+			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM 
 
 			Process[] pname = Process.GetProcessesByName(process_name);
 			if (pname.Length > 0)
@@ -31,25 +65,55 @@ namespace MXSPyCOM
 
 		static string make_python_wrapper(string python_filepath)
 		{
-			/// <summary>
+			/// It is not possible to directly execute Python files in 3ds Max via calling filein() on the COM server.
+			/// Luckily MaxScript supports Python.ExecuteFile(filepath). This function takes the provided Python file
+			/// and wraps it a Python.ExecuteFile() command within a MaxScript file that is saved to the user's %TEMP% folder.
+			/// That temporary MaxScript file is what is sent to 3ds Max's COM server.
 			/// 
-			/// </summary>
+			/// **Arguments:**
 			/// 
+			/// :``python_filepath``: `string` A full absolute filepath to a Python (.py) file.
+			/// 
+			/// **Keyword Arguments:**
+			///
+			/// None
+			/// 
+			/// **Returns:**
+			/// 
+			/// :``wrapper_filepath``: `string`
+			/// 
+			/// **Author:**
+			/// 
+			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
 
 			string cmd = String.Format("python.ExecuteFile(@\"{0}\")", python_filepath);
-			string WRAPPER_FILEPATH = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "maxscript_python_wrapper.ms");
-			System.IO.File.WriteAllText(WRAPPER_FILEPATH, cmd);
+			string wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "maxscript_python_wrapper.ms");
+			System.IO.File.WriteAllText(wrapper_filepath, cmd);
 
-			return WRAPPER_FILEPATH;
+			return wrapper_filepath;
 		}
 
 
 		static void show_message(string message, bool exit = true)
 		{
-			/// <summary>
+			/// Displays an error or informational dialog if the execution of MXSPyCOM encounters a problem. 
+			/// Also displays a standard help dialog if MXSPyCOM is called with no arguments or with the /? or /help arguments.
 			/// 
-			/// </summary>
+			/// **Arguments:**
 			/// 
+			/// :``message``: `string` The message to display.
+			/// 
+			/// **Keyword Arguments:**
+			///
+			/// :``exit``: `bool` Controls whether or not MXSPyCOM should quit execution after the user has clicked OK on the message dialog.
+			/// 
+			/// **Returns:**
+			/// 
+			/// None
+			/// 
+			/// **Author:**
+			/// 
+			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
 
 			MessageBoxIcon icon = MessageBoxIcon.Error;
 
@@ -58,7 +122,7 @@ namespace MXSPyCOM
 				message = @"Used to execute MaxScript and Python scripts in 3ds Max.
 
 Usage:
-MXSPyCOM.exe [options] -f <filename>
+MXSPyCOM.exe [options] /f <filename>
 
 Commands:
 <filename>	- Full path to the script file to execute.
@@ -68,7 +132,9 @@ Options:
 /o		- Echo output buffer.";
 				icon = MessageBoxIcon.Information;
 			}
+
 			MessageBox.Show(message, "MXSPyCOM", MessageBoxButtons.OK, icon);
+
 			if (exit)
 			{
 				Environment.Exit(0);
@@ -78,10 +144,26 @@ Options:
 
 		static string validate_args(string[] args)
 		{
-			/// <summary>
+			/// Validates the command line arguments used when MXSPyCOM was called.
+			/// If no arguments are provided or the /? or /help arguments are provided then a help/usage dialog will be displayed.
+			/// If /f is provided a full absolute filepath to the script file to execute is expected to be the next argument.
+			/// If there is no filepath provided or if the file does not exist on disk an error dialog will be displayed.
 			/// 
-			/// </summary>
+			/// **Arguments:**
 			/// 
+			/// :``args``: `string[]` The arguments provided to MXSPyCOM
+			/// 
+			/// **Keyword Arguments:**
+			///
+			/// None
+			/// 
+			/// **Returns:**
+			/// 
+			/// :``filepath``: `string` A full absolute filepath to the script to execute in 3ds Max.
+			/// 
+			/// **Author:**
+			/// 
+			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
 
 			string msg = "";
 
@@ -117,7 +199,7 @@ Options:
 
 					return filepath;
 				}
-				catch(IndexOutOfRangeException e)
+				catch(IndexOutOfRangeException)
 				{
 					msg = String.Format("No script file provided. {0}", USAGE_INFO);
 					show_message(msg, true);
@@ -129,10 +211,23 @@ Options:
 
 		static void Main(string[] args)
 		{
-			/// <summary>
+			/// The main execution function of MXSPyCOM
 			/// 
-			/// </summary>
+			/// **Arguments:**
 			/// 
+			/// :``args``: `string[]` The arguments provided to MXSPyCOM
+			/// 
+			/// **Keyword Arguments:**
+			///
+			/// None
+			/// 
+			/// **Returns:**
+			/// 
+			/// None
+			/// 
+			/// **Author:**
+			/// 
+			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
 
 			if (args.Length == 0)
 			{
