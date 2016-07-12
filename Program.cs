@@ -32,7 +32,7 @@ namespace MXSPyCOM
 		/// 
 		/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
 
-		const string USAGE_INFO = "\nType \"MXSPyCOM /?\" for usage info.";
+		const string USAGE_INFO = "\nType \"MXSPyCOM\" for usage info.";
 
 
 		static void execute_max_commands(string[] args, string filepath)
