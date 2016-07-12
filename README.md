@@ -18,6 +18,6 @@ To Use:
   For instance, in UltraEdit (www.ultraedit.com) go to Advanced \ User Tools \ Configure Tools
     * On the Tool Configuration dialog insert a new command. 
     * Set the Menu Item Name to something like, "Execute Script in 3ds Max". 
-    * Set the command line to the path where MXSPyCOM.exe is located, a /f command switch and "%f", which UltraEdit replaces with the
-      filepath of the current document. E.g. C:\Program Files\MXSPyCOM\MXSPyCOM.exe /f "%f"
+    * Set the command line to the path where MXSPyCOM.exe is located, a -f command switch and "%f", which UltraEdit replaces with the
+      filepath of the current document. E.g. C:\Program Files\MXSPyCOM\MXSPyCOM.exe -f "%f"
     * Click OK to add the command.
