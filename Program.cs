@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Forms;
 
+
 namespace MXSPyCOM
 {
 	class Program
@@ -31,7 +32,106 @@ namespace MXSPyCOM
 		/// 
 		/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
 
-		const string USAGE_INFO = "Type \"MXSPyCOM /?\" for usage info.";
+		const string USAGE_INFO = "\nType \"MXSPyCOM /?\" for usage info.";
+
+
+		static void execute_max_commands(string[] args, string filepath)
+		{
+			/// Parses the command line arguments and calls the corresponding command on Max's COM server with the provied filepath.
+			/// 
+			/// **Arguments:**
+			/// 
+			/// :``args``: `string[]`: The command line arguments sent to MXSPyCOM
+			/// :``filepath: `string`: A full absolute filepath to a MaxScript (.ms) or Python (.py) file.
+			/// 
+			/// **Keyword Arguments:**
+			///
+			/// None
+			/// 
+			/// **Returns:**
+			/// 
+			/// None
+			/// 
+			/// **TODO:**
+			/// 
+			/// Should support for Max's COM server execute() function be added? It doesn't act on files, but on strings of MaxScript commands.
+			/// It doesn't seem necessary for this tool, honestly.
+			/// 
+			/// **Author:**
+			/// 
+			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 11, 2016 9:12:00 PM
+
+			bool max_running = is_process_running("3dsmax");
+			if (max_running)
+			{
+				if (args.Length == 1)
+				{
+					string msg = String.Format("No options provided.", USAGE_INFO);
+					show_message(msg);
+				}
+				else
+				{
+					var com_type = Type.GetTypeFromProgID("Max.Application");
+					dynamic com_obj = Activator.CreateInstance(com_type);
+					string ext = System.IO.Path.GetExtension(filepath).ToLower();
+
+					foreach (string arg in args)
+					{
+						switch (arg.ToLower())
+						{
+							case "-f":
+								
+								if (ext == ".py")
+								{
+									filepath = make_python_wrapper(filepath);
+								}
+
+								try
+								{
+									com_obj.filein(filepath);
+								}
+								catch (System.Runtime.InteropServices.COMException) { }
+								break;
+
+							case "-e":
+								try
+								{									
+									com_obj.edit(filepath);
+								}
+								catch (System.Runtime.InteropServices.COMException) { }
+								break;
+
+							case "-c":
+								if (ext == ".ms")
+								{
+									try
+									{
+										com_obj.edit(filepath);
+									}
+									catch (System.Runtime.InteropServices.COMException) { }
+								}
+								else
+								{
+									string msg = String.Format("Only MaxScript files can be encrypted. {0}", USAGE_INFO);
+									show_message(msg);
+								}
+								break;
+
+							default:
+								return;
+						}
+					}
+				}
+			}
+			else
+			{
+				string msg = "3ds Max (3dsmax.exe) is not currently running.";
+				show_message(msg);
+			}
+
+			return;
+		}
+
 
 		static bool is_process_running(string process_name)
 		{
@@ -94,7 +194,7 @@ namespace MXSPyCOM
 		}
 
 
-		static void show_message(string message, bool exit = true)
+		static void show_message(string message, bool info = false)
 		{
 			/// Displays an error or informational dialog if the execution of MXSPyCOM encounters a problem. 
 			/// Also displays a standard help dialog if MXSPyCOM is called with no arguments or with the /? or /help arguments.
@@ -105,7 +205,7 @@ namespace MXSPyCOM
 			/// 
 			/// **Keyword Arguments:**
 			///
-			/// :``exit``: `bool` Controls whether or not MXSPyCOM should quit execution after the user has clicked OK on the message dialog.
+			/// :``information``: `bool` Determines if the dialog should display with an informational or warning icon.
 			/// 
 			/// **Returns:**
 			/// 
@@ -115,39 +215,39 @@ namespace MXSPyCOM
 			/// 
 			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
 
-			MessageBoxIcon icon = MessageBoxIcon.Error;
+			MessageBoxIcon icon = info == true ? MessageBoxIcon.Information : MessageBoxIcon.Error;
 
 			if (message.ToLower() == "help")
 			{
 				message = @"Used to execute MaxScript and Python scripts in 3ds Max.
 
 Usage:
-MXSPyCOM.exe [options] /f <filename>
-
-Commands:
-<filename>	- Full path to the script file to execute.
+MXSPyCOM.exe [options] <filename>
 
 Options:
-/debug		- Display debug output.
-/o		- Echo output buffer.";
-				icon = MessageBoxIcon.Information;
+-f	- filein (execute) the script in 3ds Max.
+-e	- Edit the script in 3ds Max's internal script editor.
+-c	- Encrypt the script. Only works with MaxScript files.
+
+Commands:
+<filename>	- Full path to the script file to execute.";
+
+				show_message(message, info:true);
 			}
 
 			MessageBox.Show(message, "MXSPyCOM", MessageBoxButtons.OK, icon);
 
-			if (exit)
-			{
-				Environment.Exit(0);
-			}
+			Environment.Exit(0);
 		}
 
 
-		static string validate_args(string[] args)
+		static string get_script_filepath(string[] args)
 		{
-			/// Validates the command line arguments used when MXSPyCOM was called.
-			/// If no arguments are provided or the /? or /help arguments are provided then a help/usage dialog will be displayed.
-			/// If /f is provided a full absolute filepath to the script file to execute is expected to be the next argument.
-			/// If there is no filepath provided or if the file does not exist on disk an error dialog will be displayed.
+			/// Extracts the script filepath from the command line arguments.
+			/// If no filepath is provied in args the user is notifed and the program exits.
+			/// If the filepath provided contains a Python script that script is wrapped in
+			/// a MaxScript wrapper, because 3ds Max's COM interface will not correctly parse
+			/// a Python file, and the filepath to that temporary wrapper script is returned.
 			/// 
 			/// **Arguments:**
 			/// 
@@ -165,47 +265,20 @@ Options:
 			/// 
 			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
 
-			string msg = "";
-
-			if (args.Length == 0 || Array.IndexOf(args, "/?") >= 0 || Array.IndexOf(args, "help") >= 0)
+			string filepath = args[args.Length - 1];
+			if (filepath.StartsWith("-"))
 			{
-				show_message("help");
+				string msg = String.Format("No script filepath provided. {0}", USAGE_INFO);
+				show_message(msg);
+			}
+			else if (!System.IO.File.Exists(filepath))
+			{
+				string msg = String.Format("The specified script file does not exist on disk. {0}", USAGE_INFO);
+				show_message(msg);
 			}
 
-			int idx = Array.IndexOf(args, "/f");
-			if (idx < 0)
-			{
-				msg = String.Format("No script filepath specified. {0}", USAGE_INFO);
-				show_message(msg, false);
-				return "";
-			}
-			else
-			{
-				try
-				{
-					string filepath = args[idx + 1];
-
-					if (!System.IO.File.Exists(filepath))
-					{
-						msg = String.Format("The specified script file does not exist on disk. {0}", USAGE_INFO);
-						show_message(msg);
-					}
-
-					string ext = System.IO.Path.GetExtension(filepath);
-					if (ext.ToLower() == ".py")
-					{
-						filepath = make_python_wrapper(filepath);
-					}
-
-					return filepath;
-				}
-				catch(IndexOutOfRangeException)
-				{
-					msg = String.Format("No script file provided. {0}", USAGE_INFO);
-					show_message(msg, true);
-					return "";
-				}
-			}
+			filepath = filepath.Replace("\\", "\\\\");
+			return filepath;
 		}
 
 
@@ -228,41 +301,15 @@ Options:
 			/// **Author:**
 			/// 
 			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
-
+			
 			if (args.Length == 0)
 			{
 				show_message("help");
 			}
 			else
 			{
-				string filepath = "";
-				//string[] options;
-
-				filepath = validate_args(args);
-				filepath = filepath.Replace("\\", "\\\\");
-
-				if (filepath != "")
-				{
-					bool max_running = is_process_running("3dsmax");
-					if (max_running)
-					{
-						var com_type = Type.GetTypeFromProgID("Max.Application");
-						dynamic com_obj = Activator.CreateInstance(com_type);
-						try
-						{
-							com_obj.filein(filepath);
-						}
-						catch (System.Runtime.InteropServices.COMException)
-						{
-
-						}
-					}
-					else
-					{
-						string msg = "3ds Max (3dsmax.exe) is not currently running.";
-						show_message(msg);
-					}
-				}
+				string filepath = get_script_filepath(args);
+				execute_max_commands(args, filepath);
 			}
 
 			Environment.Exit(0);
