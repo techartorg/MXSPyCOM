@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("MXSPyCOM")]
-[assembly: AssemblyCopyright("Copyright ©  2016 Jeff Hanna, All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © 2016 Jeff Hanna, All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

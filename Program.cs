@@ -106,7 +106,7 @@ namespace MXSPyCOM
 								{
 									try
 									{
-										com_obj.edit(filepath);
+										com_obj.encryptscript(filepath);
 									}
 									catch (System.Runtime.InteropServices.COMException) { }
 								}
