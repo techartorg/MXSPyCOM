@@ -92,6 +92,20 @@ namespace MXSPyCOM
 								}
 								catch (System.Runtime.InteropServices.COMException) { }
 								break;
+							
+							case "-s":
+							
+								if (ext == ".py")
+								{
+									filepath = make_python_wrapper(filepath, suppress_dialogs: true);
+								}
+
+								try
+								{
+									com_obj.execute(mxs_filein_catch_errors_cmd(filepath));
+								}
+								catch (System.Runtime.InteropServices.COMException) { }
+								break;
 
 							case "-e":
 								try
@@ -163,7 +177,7 @@ namespace MXSPyCOM
 		}
 
 
-		static string make_python_wrapper(string python_filepath)
+		static string make_python_wrapper(string python_filepath, bool suppress_dialogs = false)
 		{
 			/// It is not possible to directly execute Python files in 3ds Max via calling filein() on the COM server.
 			/// Luckily MaxScript supports Python.ExecuteFile(filepath). This function takes the provided Python file
@@ -188,7 +202,15 @@ namespace MXSPyCOM
 
 			string cmd = String.Format("python.ExecuteFile(@\"{0}\")", python_filepath);
 			string wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "maxscript_python_wrapper.ms");
-			System.IO.File.WriteAllText(wrapper_filepath, cmd);
+			
+			if (suppress_dialogs == true)
+			{
+				System.IO.File.WriteAllText(wrapper_filepath, mxs_filein_catch_errors_cmd(python_filepath));
+			} 
+			else
+			{
+				System.IO.File.WriteAllText(wrapper_filepath, cmd);
+			}
 
 			return wrapper_filepath;
 		}
@@ -196,6 +218,26 @@ namespace MXSPyCOM
 
 		static string mxs_filein_catch_errors_cmd(string filepath)
 		{
+			/// Creates and returns a MAXScript command string that will run the given filepath using fileIn()
+			/// and catch errors using a MAXScript try() catch() that prints a minimally useful log message 
+			/// to the MAXScript Listener instead of the usual pop-up error dialogs.
+			/// 
+			/// **Arguments:**
+			/// 
+			/// :``filepath``: `string` A full absolute filepath to the script to execute in 3ds Max.
+			/// 
+			/// **Keyword Arguments:**
+			///
+			/// None
+			/// 
+			/// **Returns:**
+			/// 
+			/// :``trycatchcmd``: `string`
+			/// 
+			/// **Author:**
+			/// 
+			/// Gary Tyler, mail@garytyler.com, April 12, 2018 10:00:00 AM
+
 			string file_line = String.Format(" Error while running: {0}", filepath);
 			string mxs_exception_array = "(filterString (getCurrentException()) \"\n\")";
 			string trycmd = String.Format("filein(@\"{0}\")", filepath);
@@ -237,6 +279,7 @@ MXSPyCOM.exe [options] <filename>
 
 Options:
 -f	- filein (execute) the script in 3ds Max.
+-s	- filein (execute) the script in 3ds Max with suppressed error dialogs.
 -e	- Edit the script in 3ds Max's internal script editor.
 -c	- Encrypt the script. Only works with MaxScript files.
 
