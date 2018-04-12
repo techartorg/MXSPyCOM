@@ -194,6 +194,17 @@ namespace MXSPyCOM
 		}
 
 
+		static string mxs_filein_catch_errors_cmd(string filepath)
+		{
+			string file_line = String.Format(" Error while running: {0}", filepath);
+			string mxs_exception_array = "(filterString (getCurrentException()) \"\n\")";
+			string trycmd = String.Format("filein(@\"{0}\")", filepath);
+			string catchcmd = String.Format("(for i in #(\"{0}\") + {1} do print i)", file_line, mxs_exception_array);
+			string trycatchcmd = String.Format("try({0}) catch({1})", trycmd, catchcmd);
+			return trycatchcmd;
+		}
+
+
 		static void show_message(string message, bool info = false)
 		{
 			/// Displays an error or informational dialog if the execution of MXSPyCOM encounters a problem. 
