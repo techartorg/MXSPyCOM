@@ -97,12 +97,6 @@ namespace MXSPyCOM
 
 								try
 								{
-									com_obj.execute("clearListener()");
-								}
-								catch (System.Runtime.InteropServices.COMException) { }
-
-								try
-								{
 									com_obj.execute(mxs_try_catch_errors_cmd(filepath));
 								}
 								catch (System.Runtime.InteropServices.COMException) { }
@@ -235,15 +229,15 @@ namespace MXSPyCOM
 			string ext = System.IO.Path.GetExtension(filepath).ToLower();
 
 			string location;
-			string runcall;
+			string run_cmd;
 
 			if (ext == ".py")
 			{
 				/// For python files, use passed filepath for location msg, no pos or line available
-				location = String.Format("\"\nError; filename: {0}\"", filepath);
+				location = String.Format("\" Error; filename: {0}\"", filepath);
 
 				/// Pass thru python.ExecuteFile()
-				runcall = String.Format("python.ExecuteFile(@\"{0}\")", filepath);
+				run_cmd = String.Format("python.ExecuteFile(@\"{0}\")", filepath);
 			}
 			else
 			{
@@ -251,14 +245,15 @@ namespace MXSPyCOM
 				string loc_file = "\" filename: \" + (getErrorSourceFileName() as string)";
 				string loc_pos = "\"; position: \" + ((getErrorSourceFileOffset() as integer) as string)";
 				string loc_line = "\"; line: \" + ((getErrorSourceFileLine() as integer) as string)";
-				location = String.Format("\"\nError;\" + {0} + {1} + {2}", loc_file, loc_pos, loc_line);
+				location = String.Format("\" Error;\" + {0} + {1} + {2}", loc_file, loc_pos, loc_line);
 
 				/// Pass thru filein()
-				runcall = String.Format("filein(@\"{0}\")", filepath);
+				run_cmd = String.Format("filein(@\"{0}\")", filepath);
 			}
 			string exception_array = "(filterString (getCurrentException()) \"\n\")";
-			string print_error = String.Format("(for i in #({0}) + {1} do print i)", location, exception_array);
-			string cmd = String.Format("try({0}) catch({1})", runcall, print_error);
+
+			string exception_msg = String.Format("(for i in #({0}) + {1} do setListenerSelText (\"\n\" + i))", location, exception_array);
+			string cmd = String.Format("try({0}) catch({1})", run_cmd, exception_msg);
 			return cmd;
 		}
 
