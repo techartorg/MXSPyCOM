@@ -80,7 +80,7 @@ namespace MXSPyCOM
 						switch (arg.ToLower())
 						{
 							case "-f":
-								
+
 								if (ext == ".py")
 								{
 									filepath = make_python_wrapper(filepath);
@@ -93,9 +93,18 @@ namespace MXSPyCOM
 								catch (System.Runtime.InteropServices.COMException) { }
 								break;
 
+							case "-s":
+
+								try
+								{
+									com_obj.execute(mxs_try_catch_errors_cmd(filepath));
+								}
+								catch (System.Runtime.InteropServices.COMException) { }
+								break;
+
 							case "-e":
 								try
-								{									
+								{
 									com_obj.edit(filepath);
 								}
 								catch (System.Runtime.InteropServices.COMException) { }
@@ -194,6 +203,61 @@ namespace MXSPyCOM
 		}
 
 
+		static string mxs_try_catch_errors_cmd(string filepath)
+		{
+			/// Wraps the given MAXScript command arg in MAXScript code that when run in 3ds Max will catch 
+			/// errors using a MAXScript try() catch() and print a 'homemade' minimally useful log message 
+			/// to the MAXScript Listener instead of the usual proper one.
+			/// 
+			/// **Arguments:**
+			/// 
+			/// :``command: `string` A fumaxscript command to wrap
+			/// :``log_filepath``: `string` The filepath to use in the MAXScript Listerner log message	
+			/// 
+			/// **Keyword Arguments:**
+			///
+			/// None
+			/// 
+			/// **Returns:**
+			/// 
+			/// :``cmd``: `string`
+			/// 
+			/// **Author:**
+			/// 
+			/// Gary Tyler, mail@garytyler.com, April 12, 2018 10:00:00 AM
+
+			string ext = System.IO.Path.GetExtension(filepath).ToLower();
+
+			string location;
+			string run_cmd;
+
+			if (ext == ".py")
+			{
+				/// For python files, use passed filepath for location msg, no pos or line available
+				location = String.Format("\" Error; filename: {0}\"", filepath);
+
+				/// Pass thru python.ExecuteFile()
+				run_cmd = String.Format("python.ExecuteFile(@\"{0}\")", filepath);
+			}
+			else
+			{
+				/// For maxscript files, use provided commands for location msg
+				string loc_file = "\" filename: \" + (getErrorSourceFileName() as string)";
+				string loc_pos = "\"; position: \" + ((getErrorSourceFileOffset() as integer) as string)";
+				string loc_line = "\"; line: \" + ((getErrorSourceFileLine() as integer) as string)";
+				location = String.Format("\" Error;\" + {0} + {1} + {2}", loc_file, loc_pos, loc_line);
+
+				/// Pass thru filein()
+				run_cmd = String.Format("filein(@\"{0}\")", filepath);
+			}
+			string exception_array = "(filterString (getCurrentException()) \"\n\")";
+
+			string exception_msg = String.Format("(for i in #({0}) + {1} do setListenerSelText (\"\n\" + i))", location, exception_array);
+			string cmd = String.Format("try({0}) catch({1})", run_cmd, exception_msg);
+			return cmd;
+		}
+
+
 		static void show_message(string message, bool info = false)
 		{
 			/// Displays an error or informational dialog if the execution of MXSPyCOM encounters a problem. 
@@ -226,13 +290,14 @@ MXSPyCOM.exe [options] <filename>
 
 Options:
 -f	- filein (execute) the script in 3ds Max.
+-s	- filein (execute) the script in 3ds Max with suppressed error dialogs.
 -e	- Edit the script in 3ds Max's internal script editor.
 -c	- Encrypt the script. Only works with MaxScript files.
 
 Commands:
 <filename>	- Full path to the script file to execute.";
 
-				show_message(message, info:true);
+				show_message(message, info: true);
 			}
 
 			MessageBox.Show(message, "MXSPyCOM", MessageBoxButtons.OK, icon);
@@ -301,7 +366,7 @@ Commands:
 			/// **Author:**
 			/// 
 			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
-			
+
 			if (args.Length == 0)
 			{
 				show_message("help");
