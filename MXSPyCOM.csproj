@@ -81,7 +81,6 @@
     <None Include="App.config" />
     <None Include="hello_world.ms" />
     <None Include="initialize_COM_server.ms" />
-    <None Include="MXSPyCOM_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="hello_world.py" />

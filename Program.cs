@@ -246,7 +246,7 @@ namespace MXSPyCOM
 				string loc_pos = "\"; position: \" + ((getErrorSourceFileOffset() as integer) as string)";
 				string loc_line = "\"; line: \" + ((getErrorSourceFileLine() as integer) as string) + \"\n\"";
 				string callstack_line = "\"callstack: \n\" + (cs as string)";
-				location = String.Format("\"Error;\" + {0} + {1} + {2} +{3}", loc_file, loc_pos, loc_line, callstack_line);
+				location = String.Format("\"Error;\" + {0} + {1} + {2} + {3}", loc_file, loc_pos, loc_line, callstack_line);
 
 				/// Pass thru filein()
 				run_cmd = String.Format("filein(@\"{0}\")", filepath);
