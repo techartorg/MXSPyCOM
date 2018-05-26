@@ -10,14 +10,4 @@ MXSPyCOM is a C# based replacement for MXSCOM. It offers the same functionality 
 It also supports editing of Python files and having them execute in versions of 3ds Max, starting with 3ds Max 2015, that support Python
 scripts.
 
-To Use:
-* Put MXSPyCOM.exe on your harddrive.
-* Put the initialize_COM_server.ms file in %localappdata%\autodesk\3dsmax\<Max Version>\<Country Code>\scripts\startup
-    for instance, %localappdata%\autodesk\3dsmax\2017 - 64bit\scripts\startup
-* In your editor of choice add an external tool. 
-  For instance, in UltraEdit (www.ultraedit.com) go to Advanced \ User Tools \ Configure Tools
-    * On the Tool Configuration dialog insert a new command. 
-    * Set the Menu Item Name to something like, "Execute Script in 3ds Max". 
-    * Set the command line to the path where MXSPyCOM.exe is located, a -f command switch and "%f", which UltraEdit replaces with the
-      filepath of the current document. E.g. C:\Program Files\MXSPyCOM\MXSPyCOM.exe -f "%f"
-    * Click OK to add the command.
+Instructions on how to install MXSPyCOM and how to configure most popular code editors to use it as an external tool can be found in [this project's Wiki](https://github.com/JeffHanna/MXSPyCOM/wiki).
