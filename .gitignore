@@ -9,6 +9,7 @@
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
+.mypy_cache/
 
 # Build results
 [Dd]ebug/
