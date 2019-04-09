@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.mypy_cache": true,
+			"**/.vs": true
+		}
+	}
+}
