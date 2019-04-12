@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Reflection;
+using static System.Reflection.BindingFlags;
 using System.Windows.Forms;
 using static Westwind.Utilities.ReflectionUtils;
 
@@ -83,7 +83,6 @@ namespace MXSPyCOM
 						switch (arg.ToLower())
 						{
 							case "-f":
-
 								if (ext == ".py")
 								{
 									filepath = make_python_wrapper(filepath);
@@ -91,22 +90,16 @@ namespace MXSPyCOM
 
 								try
 								{
-									com_obj.GetType().InvokeMember("filein", Westwind.Utilities.ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, null, com_obj, new object[]
-									{
-										filepath
-									});
+									com_obj.GetType().InvokeMember("filein", MemberAccess | InvokeMethod, null, com_obj, new object[] {filepath});
 								}
 								catch (System.Reflection.TargetInvocationException) { }
 								break;
 
 							case "-s":
-
 								try
 								{
-									com_obj.GetType().InvokeMember("execute", Westwind.Utilities.ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, null, com_obj, new object[]
-									{
-										mxs_try_catch_errors_cmd(filepath)
-									});
+									filepath = mxs_try_catch_errors_cmd(filepath);
+									com_obj.GetType().InvokeMember("execute", MemberAccess | InvokeMethod, null, com_obj, new object[] {filepath});
 								}
 								catch (System.Reflection.TargetInvocationException) { }
 								break;
@@ -114,10 +107,7 @@ namespace MXSPyCOM
 							case "-e":
 								try
 								{
-									com_obj.GetType().InvokeMember("edit", Westwind.Utilities.ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, null, com_obj, new object[]
-									{
-										filepath
-									});
+									com_obj.GetType().InvokeMember("edit", MemberAccess | InvokeMethod, null, com_obj, new object[] {filepath});
 								}
 								catch (System.Reflection.TargetInvocationException) { }
 								break;
@@ -127,10 +117,7 @@ namespace MXSPyCOM
 								{
 									try
 									{
-										com_obj.GetType().InvokeMember("encryptscript", Westwind.Utilities.ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, null, com_obj, new object[]
-									{
-										filepath
-									});
+										com_obj.GetType().InvokeMember("encryptscript", MemberAccess | InvokeMethod, null, com_obj, new object[] {filepath});
 									}
 									catch (System.Reflection.TargetInvocationException) { }
 								}
@@ -386,6 +373,11 @@ Commands:
 			if (args.Length == 0)
 			{
 				show_message("help");
+				
+				// For testing
+				//string filepath = @"d:\repos\mxspycom\hello_world.ms";
+				//string[] test_args = new string[2] {"-f", filepath};
+				//execute_max_commands(test_args, filepath);
 			}
 			else
 			{
