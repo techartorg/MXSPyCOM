@@ -123,7 +123,6 @@ namespace MXSPyCOM
 								break;
 
 							case "-c":
-								// TODO: Jeff Hanna - 4/11/2019 - Has Autodesk removed the encryptscript COM method in 3ds Max 2020+?
 								if (ext == ".ms")
 								{
 									try
