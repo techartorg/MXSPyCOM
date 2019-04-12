@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows.Forms;
+using static Westwind.Utilities.ReflectionUtils;
 
 
 namespace MXSPyCOM
@@ -71,8 +73,9 @@ namespace MXSPyCOM
 				}
 				else
 				{
-					var com_type = Type.GetTypeFromProgID("Max.Application");
-					dynamic com_obj = Activator.CreateInstance(com_type);
+					Type com_type = Type.GetTypeFromProgID("Max.Application");
+					object com_obj = Activator.CreateInstance(com_type);
+
 					string ext = System.IO.Path.GetExtension(filepath).ToLower();
 
 					foreach (string arg in args)
@@ -88,36 +91,49 @@ namespace MXSPyCOM
 
 								try
 								{
-									com_obj.filein(filepath);
+									com_obj.GetType().InvokeMember("filein", Westwind.Utilities.ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, null, com_obj, new object[]
+									{
+										filepath
+									});
 								}
-								catch (System.Runtime.InteropServices.COMException) { }
+								catch (System.Reflection.TargetInvocationException) { }
 								break;
 
 							case "-s":
 
 								try
 								{
-									com_obj.execute(mxs_try_catch_errors_cmd(filepath));
+									com_obj.GetType().InvokeMember("execute", Westwind.Utilities.ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, null, com_obj, new object[]
+									{
+										mxs_try_catch_errors_cmd(filepath)
+									});
 								}
-								catch (System.Runtime.InteropServices.COMException) { }
+								catch (System.Reflection.TargetInvocationException) { }
 								break;
 
 							case "-e":
 								try
 								{
-									com_obj.edit(filepath);
+									com_obj.GetType().InvokeMember("edit", Westwind.Utilities.ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, null, com_obj, new object[]
+									{
+										filepath
+									});
 								}
-								catch (System.Runtime.InteropServices.COMException) { }
+								catch (System.Reflection.TargetInvocationException) { }
 								break;
 
 							case "-c":
+								// TODO: Jeff Hanna - 4/11/2019 - Has Autodesk removed the encryptscript COM method in 3ds Max 2020+?
 								if (ext == ".ms")
 								{
 									try
 									{
-										com_obj.encryptscript(filepath);
+										com_obj.GetType().InvokeMember("encryptscript", Westwind.Utilities.ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, null, com_obj, new object[]
+									{
+										filepath
+									});
 									}
-									catch (System.Runtime.InteropServices.COMException) { }
+									catch (System.Reflection.TargetInvocationException) { }
 								}
 								else
 								{

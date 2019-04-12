@@ -14,4 +14,8 @@
     <Description>A modern version of MXSCOM, to allow for editing &amp; execution of 3ds Max MaxScript and Python files from external code editors.</Description>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="westwind.utilities" Version="3.0.24" />
+  </ItemGroup>
+
 </Project>
