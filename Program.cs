@@ -30,7 +30,7 @@ namespace MXSPyCOM
 		///
 		/// **Author:**
 		///
-		/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
+		/// Jeff Hanna, jeff@techart.online, July 9, 2016
 
 		const string USAGE_INFO = "\nType \"MXSPyCOM\" for usage info.";
 
@@ -59,7 +59,7 @@ namespace MXSPyCOM
 			///
 			/// **Author:**
 			///
-			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 11, 2016 9:12:00 PM
+			/// Jeff Hanna, jeff@techart.online, July 11, 2016
 
 			bool max_running = is_process_running("3dsmax");
 			if (max_running)
@@ -80,7 +80,6 @@ namespace MXSPyCOM
 						switch (arg.ToLower())
 						{
 							case "-f":
-
 								if (ext == ".py")
 								{
 									filepath = make_python_wrapper(filepath);
@@ -94,7 +93,6 @@ namespace MXSPyCOM
 								break;
 
 							case "-s":
-
 								try
 								{
 									com_obj.execute(mxs_try_catch_errors_cmd(filepath));
@@ -160,7 +158,7 @@ namespace MXSPyCOM
 			///
 			/// **Author:**
 			///
-			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
+			/// Jeff Hanna, jeff@techart.online, July 9, 2016
 
 			Process[] pname = Process.GetProcessesByName(process_name);
 			if (pname.Length > 0)
@@ -193,7 +191,7 @@ namespace MXSPyCOM
 			///
 			/// **Author:**
 			///
-			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
+			/// Jeff Hanna, jeff@techart.online, July 9, 2016
 
 			string cmd = String.Format("python.ExecuteFile(@\"{0}\")", python_filepath);
 			string wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "maxscript_python_wrapper.ms");
@@ -224,7 +222,7 @@ namespace MXSPyCOM
 			///
 			/// **Author:**
 			///
-			/// Gary Tyler, mail@garytyler.com, April 12, 2018 10:00:00 AM
+			/// Gary Tyler, mail@garytyler.com, April 12, 2018
 
 			string ext = System.IO.Path.GetExtension(filepath).ToLower();
 
@@ -278,7 +276,7 @@ namespace MXSPyCOM
 			///
 			/// **Author:**
 			///
-			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
+			/// Jeff Hanna, jeff@techart.online, July 9, 2016
 
 			MessageBoxIcon icon = info == true ? MessageBoxIcon.Information : MessageBoxIcon.Error;
 
@@ -329,7 +327,7 @@ Commands:
 			///
 			/// **Author:**
 			///
-			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
+			/// Jeff Hanna, jeff@techart.online, July 9, 2016
 
 			string filepath = args[args.Length - 1];
 			if (filepath.StartsWith("-"))
@@ -366,7 +364,7 @@ Commands:
 			///
 			/// **Author:**
 			///
-			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
+			/// Jeff Hanna, jeff@techart.online, July 9, 2016
 
 			if (args.Length == 0)
 			{
