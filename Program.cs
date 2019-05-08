@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 
@@ -36,8 +34,6 @@ namespace MXSPyCOM
 
 		const string USAGE_INFO = "\nType \"MXSPyCOM\" for usage info.";
 
-		const string LISTENER_LOG_FILE_NAME = "mxspycom_listener.log";
-
 
 		static void execute_max_commands(string[] args, string filepath)
 		{
@@ -66,9 +62,6 @@ namespace MXSPyCOM
 			/// Jeff Hanna, jeff@techart.online, July 11, 2016
 
 			bool max_running = is_process_running("3dsmax");
-			string localappdata = Environment.GetEnvironmentVariable("LocalAppData");
-			string logPath = Path.Combine(localappdata, LISTENER_LOG_FILE_NAME);
-
 			if (max_running)
 			{
 				if (args.Length == 1)
@@ -99,37 +92,9 @@ namespace MXSPyCOM
 								catch (System.Runtime.InteropServices.COMException) { }
 								break;
 
-							case "-ll":
-								try
-								{
-									com_obj.execute("openLog \"" + logPath + "\"");
-								}
-								catch (System.Runtime.InteropServices.COMException) { }
-
-								try
-								{
-									if (ext == ".py")
-									{
-										filepath = make_python_wrapper(filepath);
-									}
-									com_obj.fileIn(filepath);
-								}
-								catch (System.Runtime.InteropServices.COMException) { }
-
-								try
-								{
-									com_obj.execute("closeLog()");
-								}
-								catch (System.Runtime.InteropServices.COMException) { }
-
-								log_listener_output(logPath);
-								break;
-
-
 							case "-s":
 								try
 								{
-
 									com_obj.execute(mxs_try_catch_errors_cmd(filepath));
 								}
 								catch (System.Runtime.InteropServices.COMException) { }
@@ -172,24 +137,6 @@ namespace MXSPyCOM
 			}
 
 			return;
-		}
-
-		/// <summary>
-		/// Get the log file located in %localappdata%/mxspycom_listener.log
-		/// and write his content in the native logger of the application run python/mxs commands 
-		/// </summary>
-		/// <returns>None</returns>
-		/// <param name="logPath">the path of the log file, located in %localappdata% </param>
-		static void log_listener_output(string logPath)
-		{
-			if (File.Exists(logPath))
-			{
-				var fileStream = new FileStream(logPath, FileMode.Open, FileAccess.Read);
-				using (var streamReader = new StreamReader(fileStream, Encoding.UTF8))
-				{
-					Console.WriteLine(streamReader.ReadToEnd());
-				}
-			}
 		}
 
 
