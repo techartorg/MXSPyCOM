@@ -3,8 +3,9 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <UseWPF>true</UseWPF>
+    <UseWPF>false</UseWPF>
     <StartupObject>MXSPyCOM.Program</StartupObject>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Version>1.1</Version>
     <Authors>Jeff Hanna</Authors>
     <Company>Technical Artists Forum, Inc</Company>
