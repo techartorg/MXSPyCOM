@@ -29,7 +29,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/MXSPyCOM.csproj"
+                "${workspaceFolder}/MXSPyCOM.csproj",
                 "-c",
                 "Release"
             ],
