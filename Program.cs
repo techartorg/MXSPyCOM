@@ -309,8 +309,8 @@ Usage:
 MXSPyCOM.exe [options] <filename>
 
 Options:
--f	- filein (execute) the script in 3ds Max.
--s	- filein (execute) the script in 3ds Max with suppressed error dialogs.
+-f	- Execute the script in 3ds Max.
+-s	- Execute the script in 3ds Max with no error dialogs.
 -e	- Edit the script in 3ds Max's internal script editor.
 -c	- Encrypt the script. Only works with MaxScript files.
 
