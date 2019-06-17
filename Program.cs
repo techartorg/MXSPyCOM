@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
-using static System.Reflection.BindingFlags;
+using System.Reflection;
 using System.Windows.Forms;
-using static Westwind.Utilities.ReflectionUtils;
+using Westwind.Utilities;
 
 
 namespace MXSPyCOM
@@ -73,7 +73,8 @@ namespace MXSPyCOM
 				}
 				else
 				{
-					Type com_type = Type.GetTypeFromProgID("Max.Application");
+					string prog_id = "Max.Application";					
+					Type com_type = Type.GetTypeFromProgID(prog_id);
 					object com_obj = Activator.CreateInstance(com_type);
 
 					string ext = System.IO.Path.GetExtension(filepath).ToLower();
@@ -90,7 +91,11 @@ namespace MXSPyCOM
 
 								try
 								{
-									com_obj.GetType().InvokeMember("filein", MemberAccess | InvokeMethod, null, com_obj, new object[] {filepath});
+									com_obj.GetType().InvokeMember("filein", 
+																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, 
+																			 null, 
+																			 com_obj, 
+																			 new object[] {filepath});
 								}
 								catch (System.Reflection.TargetInvocationException) { }
 								break;
@@ -99,7 +104,11 @@ namespace MXSPyCOM
 								try
 								{
 									filepath = mxs_try_catch_errors_cmd(filepath);
-									com_obj.GetType().InvokeMember("execute", MemberAccess | InvokeMethod, null, com_obj, new object[] {filepath});
+									com_obj.GetType().InvokeMember("execute", 
+																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, 
+																			 null, 
+																			 com_obj, 
+																			 new object[] {filepath});
 								}
 								catch (System.Reflection.TargetInvocationException) { }
 								break;
@@ -107,7 +116,11 @@ namespace MXSPyCOM
 							case "-e":
 								try
 								{
-									com_obj.GetType().InvokeMember("edit", MemberAccess | InvokeMethod, null, com_obj, new object[] {filepath});
+									com_obj.GetType().InvokeMember("edit", 
+																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, 
+																			 null, 
+																			 com_obj, 
+																			 new object[] {filepath});
 								}
 								catch (System.Reflection.TargetInvocationException) { }
 								break;
@@ -117,7 +130,11 @@ namespace MXSPyCOM
 								{
 									try
 									{
-										com_obj.GetType().InvokeMember("encryptscript", MemberAccess | InvokeMethod, null, com_obj, new object[] {filepath});
+										com_obj.GetType().InvokeMember("encryptscript", 
+																				 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, 
+																				null, 
+																				com_obj, 
+																				new object[] {filepath});
 									}
 									catch (System.Reflection.TargetInvocationException) { }
 								}
