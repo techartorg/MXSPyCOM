@@ -28,10 +28,10 @@
             "command": "dotnet",
             "type": "process",
             "args": [
-                "publish",
-                "${workspaceFolder}/MXSPyCOM.csproj",
+                "publish",                
                 "-c",
-                "Release"
+                "release",
+                "${workspaceFolder}/MXSPyCOM.csproj",
             ],
             "problemMatcher": "$msCompile"
         },
