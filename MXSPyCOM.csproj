@@ -6,6 +6,7 @@
     <PublishTrimmed>true</PublishTrimmed>    
     <PublishSingleFile>true</PublishSingleFile>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>false</UseWPF>
     <StartupObject>MXSPyCOM.Program</StartupObject>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
@@ -20,6 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="westwind.utilities" Version="3.0.24" />
+    <PackageReference Include="System.Windows.Forms" Version="4.0.0" />
   </ItemGroup>
 
 </Project>

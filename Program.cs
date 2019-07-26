@@ -385,8 +385,8 @@ Commands:
 			///
 			/// **Author:**
 			///
-			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016 9:00:00 AM
-
+			/// Jeff Hanna, jeff.b.hanna@gmail.com, July 9, 2016
+			
 			if (args.Length == 0)
 			{
 				show_message("help");
