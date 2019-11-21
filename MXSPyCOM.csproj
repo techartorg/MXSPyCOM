@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <PackageReference Include="westwind.utilities" Version="3.0.24" />
-    <PackageReference Include="System.Windows.Forms" Version="4.0.0" />
   </ItemGroup>
 
 </Project>

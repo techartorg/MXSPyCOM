@@ -1,6 +1,6 @@
 {
     "version": "2.0.0",
-    "tasks": [       
+    "tasks": [
         {
             "label": "Build Debug",
             "command": "dotnet",
@@ -19,7 +19,7 @@
                 "build",
                 "${workspaceFolder}/MXSPyCOM.csproj",
                 "-c",
-                "Release"
+                "release"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -28,12 +28,18 @@
             "command": "dotnet",
             "type": "process",
             "args": [
-                "publish",                
+                "publish",
+                "-r",
+                "win-x64",
                 "-c",
                 "release",
-                "${workspaceFolder}/MXSPyCOM.csproj",
+                "${workspaceFolder}/MXSPyCOM.csproj"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         },
         {
             "label": "Watch",
@@ -49,7 +55,7 @@
         {
             "label": "Execute Script in 3ds Max (Debug)",
             "type": "shell",
-            "command": "D:\\Repos\\MXSPyCOM\\bin\\Debug\\netcoreapp3.0\\MXSPyCOM.exe",
+            "command": "${workspaceFolder}/bin/Debug/netcoreapp3.0/MXSPyCOM.exe",
             "args": [
                 "-s",
                 "${file}"
@@ -60,12 +66,12 @@
                 "focus": false,
                 "panel": "dedicated"
             },
-            "problemMatcher": [],
+            "problemMatcher": []
         },
         {
             "label": "Execute Script in 3ds Max",
             "type": "shell",
-            "command": "D:\\Repos\\MXSPyCOM\\bin\\Release\\netcoreapp3.0\\publish\\MXSPyCOM.exe",
+            "command": "${workspaceFolder}/bin/Release/netcoreapp3.0/publish/MXSPyCOM.exe",
             "args": [
                 "-s",
                 "${file}"
@@ -76,7 +82,7 @@
                 "focus": false,
                 "panel": "dedicated"
             },
-            "problemMatcher": [],
-        },        
+            "problemMatcher": []
+        }
     ]
 }
