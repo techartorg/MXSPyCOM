@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows.Forms;
+using Westwind.Utilities;
 
 
 namespace MXSPyCOM
@@ -71,8 +73,10 @@ namespace MXSPyCOM
 				}
 				else
 				{
-					var com_type = Type.GetTypeFromProgID("Max.Application");
-					dynamic com_obj = Activator.CreateInstance(com_type);
+					string prog_id = "Max.Application";					
+					Type com_type = Type.GetTypeFromProgID(prog_id);
+					object com_obj = Activator.CreateInstance(com_type);
+
 					string ext = System.IO.Path.GetExtension(filepath).ToLower();
 
 					foreach (string arg in args)
@@ -87,25 +91,38 @@ namespace MXSPyCOM
 
 								try
 								{
-									com_obj.filein(filepath);
+									com_obj.GetType().InvokeMember("filein", 
+																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, 
+																			 null, 
+																			 com_obj, 
+																			 new object[] {filepath});
 								}
-								catch (System.Runtime.InteropServices.COMException) { }
+								catch (System.Reflection.TargetInvocationException) { }
 								break;
 
 							case "-s":
 								try
 								{
-									com_obj.execute(mxs_try_catch_errors_cmd(filepath));
+									filepath = mxs_try_catch_errors_cmd(filepath);
+									com_obj.GetType().InvokeMember("execute", 
+																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, 
+																			 null, 
+																			 com_obj, 
+																			 new object[] {filepath});
 								}
-								catch (System.Runtime.InteropServices.COMException) { }
+								catch (System.Reflection.TargetInvocationException) { }
 								break;
 
 							case "-e":
 								try
 								{
-									com_obj.edit(filepath);
+									com_obj.GetType().InvokeMember("edit", 
+																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, 
+																			 null, 
+																			 com_obj, 
+																			 new object[] {filepath});
 								}
-								catch (System.Runtime.InteropServices.COMException) { }
+								catch (System.Reflection.TargetInvocationException) { }
 								break;
 
 							case "-c":
@@ -113,9 +130,13 @@ namespace MXSPyCOM
 								{
 									try
 									{
-										com_obj.encryptscript(filepath);
+										com_obj.GetType().InvokeMember("encryptscript", 
+																				 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, 
+																				null, 
+																				com_obj, 
+																				new object[] {filepath});
 									}
-									catch (System.Runtime.InteropServices.COMException) { }
+									catch (System.Reflection.TargetInvocationException) { }
 								}
 								else
 								{
@@ -288,8 +309,8 @@ Usage:
 MXSPyCOM.exe [options] <filename>
 
 Options:
--f	- filein (execute) the script in 3ds Max.
--s	- filein (execute) the script in 3ds Max with suppressed error dialogs.
+-f	- Execute the script in 3ds Max.
+-s	- Execute the script in 3ds Max with no error dialogs.
 -e	- Edit the script in 3ds Max's internal script editor.
 -c	- Encrypt the script. Only works with MaxScript files.
 
@@ -369,6 +390,11 @@ Commands:
 			if (args.Length == 0)
 			{
 				show_message("help");
+				
+				// For testing
+				//string filepath = @"d:\repos\mxspycom\hello_world.ms";
+				//string[] test_args = new string[2] {"-f", filepath};
+				//execute_max_commands(test_args, filepath);
 			}
 			else
 			{

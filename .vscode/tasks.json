@@ -1,0 +1,88 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Debug",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/MXSPyCOM.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build Release",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/MXSPyCOM.csproj",
+                "-c",
+                "release"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "-r",
+                "win-x64",
+                "-c",
+                "release",
+                "${workspaceFolder}/MXSPyCOM.csproj"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "${workspaceFolder}/MXSPyCOM.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Execute Script in 3ds Max (Debug)",
+            "type": "shell",
+            "command": "${workspaceFolder}/bin/Debug/netcoreapp3.0/MXSPyCOM.exe",
+            "args": [
+                "-s",
+                "${file}"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Execute Script in 3ds Max",
+            "type": "shell",
+            "command": "${workspaceFolder}/bin/Release/netcoreapp3.0/publish/MXSPyCOM.exe",
+            "args": [
+                "-s",
+                "${file}"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

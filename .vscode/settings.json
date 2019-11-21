@@ -1,0 +1,8 @@
+{
+	"files.exclude": {
+		"**/.mypy_cache": true,
+		"**/.vs": true,
+		"**/bin": true,
+		"**/obj": true,
+	}
+}

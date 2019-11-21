@@ -10,6 +10,8 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 .mypy_cache/
+bin/
+obj/
 
 # Build results
 [Dd]ebug/
