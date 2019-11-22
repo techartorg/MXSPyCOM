@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Forms;
@@ -13,10 +14,12 @@ namespace MXSPyCOM
 		/// In 2005 Simon Feltman released the first MXSCOM, a small Visual Basic 6 application that took commands and sent them to
 		/// Autodesk's 3ds Max's internal COM server. This allowed users to choose their own external code editor for editing MaxScript
 		/// and to be able to have their MaxScript code execute in 3ds Max by way of having the code editor utilize MXSCOM to send the file
-		/// into 3ds Max and have it executed. Modern versions of Windows can not use Simon Feltman's old MXSCOM.exe program due to it being ActiveX based.
+		/// into 3ds Max and have it executed. Modern versions of Windows can not use Simon Feltman's old MXSCOM.exe program due
+		/// to it being ActiveX based.
 		///
 		/// MXSPyCOM is a C# based replacement for MXSCOM. It offers the same functionality as MXSCOM but can run on modern versions of Windows.
-		/// It also supports editing of Python files and having them execute in versions of 3ds Max, starting with 3ds Max 2015, that support Python scripts.
+		/// It also supports editing of Python files and having them execute in versions of 3ds Max, starting with 3ds Max 2015, that support
+		/// Python scripts.
 		///
 		/// **Arguments:**
 		///
@@ -73,7 +76,7 @@ namespace MXSPyCOM
 				}
 				else
 				{
-					string prog_id = "Max.Application";					
+					string prog_id = "Max.Application";
 					Type com_type = Type.GetTypeFromProgID(prog_id);
 					object com_obj = Activator.CreateInstance(com_type);
 
@@ -91,10 +94,10 @@ namespace MXSPyCOM
 
 								try
 								{
-									com_obj.GetType().InvokeMember("filein", 
-																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, 
-																			 null, 
-																			 com_obj, 
+									com_obj.GetType().InvokeMember("filein",
+																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
+																			 null,
+																			 com_obj,
 																			 new object[] {filepath});
 								}
 								catch (System.Reflection.TargetInvocationException) { }
@@ -104,10 +107,10 @@ namespace MXSPyCOM
 								try
 								{
 									filepath = mxs_try_catch_errors_cmd(filepath);
-									com_obj.GetType().InvokeMember("execute", 
-																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, 
-																			 null, 
-																			 com_obj, 
+									com_obj.GetType().InvokeMember("execute",
+																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
+																			 null,
+																			 com_obj,
 																			 new object[] {filepath});
 								}
 								catch (System.Reflection.TargetInvocationException) { }
@@ -116,10 +119,10 @@ namespace MXSPyCOM
 							case "-e":
 								try
 								{
-									com_obj.GetType().InvokeMember("edit", 
-																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, 
-																			 null, 
-																			 com_obj, 
+									com_obj.GetType().InvokeMember("edit",
+																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
+																			 null,
+																			 com_obj,
 																			 new object[] {filepath});
 								}
 								catch (System.Reflection.TargetInvocationException) { }
@@ -130,10 +133,10 @@ namespace MXSPyCOM
 								{
 									try
 									{
-										com_obj.GetType().InvokeMember("encryptscript", 
-																				 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod, 
-																				null, 
-																				com_obj, 
+										com_obj.GetType().InvokeMember("encryptscript",
+																				 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
+																				null,
+																				com_obj,
 																				new object[] {filepath});
 									}
 									catch (System.Reflection.TargetInvocationException) { }
@@ -214,8 +217,11 @@ namespace MXSPyCOM
 			///
 			/// Jeff Hanna, jeff@techart.online, July 9, 2016
 
-			string cmd = String.Format("python.ExecuteFile(@\"{0}\")", python_filepath);
-			string wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "maxscript_python_wrapper.ms");
+			string mod_name = Path.GetFileNameWithoutExtension(python_filepath);
+			string cmd = String.Format("python.Execute(@\"import importlib;importlib.reload({0})\")\npython.ExecuteFile(@\"{1}\")",
+												mod_name,
+												python_filepath);
+			var wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "maxscript_python_wrapper.ms");
 			System.IO.File.WriteAllText(wrapper_filepath, cmd);
 
 			return wrapper_filepath;
@@ -390,7 +396,7 @@ Commands:
 			if (args.Length == 0)
 			{
 				show_message("help");
-				
+
 				// For testing
 				//string filepath = @"d:\repos\mxspycom\hello_world.ms";
 				//string[] test_args = new string[2] {"-f", filepath};
