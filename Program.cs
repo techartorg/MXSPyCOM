@@ -156,7 +156,7 @@ namespace MXSPyCOM
 			}
 			else
 			{
-				string msg = "3ds Max (3dsmax.exe) is not currently running.";
+				string msg = "3ds Max is not currently running.";
 				show_message(msg);
 			}
 
@@ -194,12 +194,44 @@ namespace MXSPyCOM
 		}
 
 
-		static string make_python_wrapper(string python_filepath)
+		static string make_python_import_reload_wrapper(string python_filepath)
 		{
 			/// It is not possible to directly execute Python files in 3ds Max via calling filein() on the COM server.
 			/// Luckily MaxScript supports Python.ExecuteFile(filepath). This function takes the provided Python file
 			/// and wraps it a Python.ExecuteFile() command within a MaxScript file that is saved to the user's %TEMP% folder.
 			/// That temporary MaxScript file is what is sent to 3ds Max's COM server.
+			///
+			/// **Arguments:**
+			///
+			/// :``python_filepath``: `string` A full absolute filepath to a Python (.py) file.
+			///
+			/// **Keyword Arguments:**
+			///
+			/// None
+			///
+			/// **Returns:**
+			///
+			/// :``reload_wrapper_filepath``: `string`
+			///
+			/// **Author:**
+			///
+			/// Jeff Hanna, jeff@techart.online, November 22, 2019
+
+			string mod_name = Path.GetFileNameWithoutExtension(python_filepath);
+			string reload_cmd = String.Format("import contextlib\nimport importlib\nwith contextlib.suppress(NameError):\n\timportlib.reload({0})",
+														 mod_name);
+			var reload_wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "import_reload.py");			
+			System.IO.File.WriteAllText(reload_wrapper_filepath, reload_cmd);
+
+			return reload_wrapper_filepath;			
+		}
+		
+
+		static string make_python_wrapper(string python_filepath)
+		{
+			/// For the python file being executed in 3ds Max this script writes a Maxscript wrapper file
+			/// that can be called to reimport that Python module so that the in-memory version is updated with 
+			/// any changes made between script executions.
 			///
 			/// **Arguments:**
 			///
@@ -217,12 +249,10 @@ namespace MXSPyCOM
 			///
 			/// Jeff Hanna, jeff@techart.online, July 9, 2016
 
-			string mod_name = Path.GetFileNameWithoutExtension(python_filepath);
-			string cmd = String.Format("python.Execute(@\"import importlib;importlib.reload({0})\")\npython.ExecuteFile(@\"{1}\")",
-												mod_name,
-												python_filepath);
+			string reload_filepath = make_python_import_reload_wrapper( python_filepath );
+			string cmd = String.Format("python.ExecuteFile(\"{0}\");python.ExecuteFile(\"{1}\")", reload_filepath, python_filepath);
 			var wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "maxscript_python_wrapper.ms");
-			System.IO.File.WriteAllText(wrapper_filepath, cmd);
+			System.IO.File.WriteAllText(wrapper_filepath, cmd);			
 
 			return wrapper_filepath;
 		}
@@ -261,8 +291,9 @@ namespace MXSPyCOM
 				/// For python files, use passed filepath for location msg, no pos or line available
 				location = String.Format("\"Error; filename: {0}\"", filepath);
 
-				/// Pass thru python.ExecuteFile()
-				run_cmd = String.Format("python.ExecuteFile(@\"{0}\")", filepath);
+				/// Pass thru python.ExecuteFile()	
+				string reload_filepath = make_python_import_reload_wrapper( filepath );
+				run_cmd = String.Format("python.ExecuteFile(\"{0}\");python.ExecuteFile(\"{1}\")", reload_filepath, filepath);
 			}
 			else
 			{
@@ -276,8 +307,8 @@ namespace MXSPyCOM
 				/// Pass thru filein()
 				run_cmd = String.Format("filein(@\"{0}\")", filepath);
 			}
-			string exception_array = "(filterString (getCurrentException()) \"\n\")";
 
+			string exception_array = "(filterString (getCurrentException()) \"\n\")";
 			string exception_msg = String.Format("(for i in #({0}) + {1} do setListenerSelText (\"\n\" + i))", location, exception_array);
 			string cmd = String.Format("try({0}) catch(cs = \"\" as stringStream;stack to:cs;{1});setListenerSelText \"\n\"", run_cmd, exception_msg);
 			return cmd;
