@@ -218,19 +218,18 @@ namespace MXSPyCOM
 			/// Jeff Hanna, jeff@techart.online, November 22, 2019
 
 			string mod_name = Path.GetFileNameWithoutExtension(python_filepath);
-			string reload_cmd = String.Format("import contextlib\nimport importlib\nwith contextlib.suppress(NameError):\n\timportlib.reload({0})",
-														 mod_name);
-			var reload_wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "import_reload.py");			
+			string reload_cmd = String.Format("import imp\ntry:\n\timp.reload({0})\nexcept:\n\tpass", mod_name);
+			var reload_wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "import_reload.py");
 			System.IO.File.WriteAllText(reload_wrapper_filepath, reload_cmd);
 
-			return reload_wrapper_filepath;			
+			return reload_wrapper_filepath;
 		}
-		
+
 
 		static string make_python_wrapper(string python_filepath)
 		{
 			/// For the python file being executed in 3ds Max this script writes a Maxscript wrapper file
-			/// that can be called to reimport that Python module so that the in-memory version is updated with 
+			/// that can be called to reimport that Python module so that the in-memory version is updated with
 			/// any changes made between script executions.
 			///
 			/// **Arguments:**
@@ -252,7 +251,7 @@ namespace MXSPyCOM
 			string reload_filepath = make_python_import_reload_wrapper( python_filepath );
 			string cmd = String.Format("python.ExecuteFile(\"{0}\");python.ExecuteFile(\"{1}\")", reload_filepath, python_filepath);
 			var wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "maxscript_python_wrapper.ms");
-			System.IO.File.WriteAllText(wrapper_filepath, cmd);			
+			System.IO.File.WriteAllText(wrapper_filepath, cmd);
 
 			return wrapper_filepath;
 		}
@@ -291,7 +290,7 @@ namespace MXSPyCOM
 				/// For python files, use passed filepath for location msg, no pos or line available
 				location = String.Format("\"Error; filename: {0}\"", filepath);
 
-				/// Pass thru python.ExecuteFile()	
+				/// Pass thru python.ExecuteFile()
 				string reload_filepath = make_python_import_reload_wrapper( filepath );
 				run_cmd = String.Format("python.ExecuteFile(\"{0}\");python.ExecuteFile(\"{1}\")", reload_filepath, filepath);
 			}
