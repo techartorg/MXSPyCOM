@@ -2,7 +2,7 @@ from pymxs import runtime
 
 try:
     import MaxPlus
-except( ImportError ):
+except ImportError:
     import shiboken2
     MaxPlus = None
 
