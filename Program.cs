@@ -220,6 +220,7 @@ namespace MXSPyCOM
 			string mod_name = Path.GetFileNameWithoutExtension(python_filepath);
 			string reload_cmd = String.Format("import imp\ntry:\n\timp.reload({0})\nexcept:\n\tpass", mod_name);
 			var reload_wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "import_reload.py");
+			reload_wrapper_filepath = reload_wrapper_filepath.Replace( "\\", "\\\\");
 			System.IO.File.WriteAllText(reload_wrapper_filepath, reload_cmd);
 
 			return reload_wrapper_filepath;
