@@ -3,6 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Forms;
+
 using Westwind.Utilities;
 
 
@@ -95,10 +96,10 @@ namespace MXSPyCOM
 								try
 								{
 									com_obj.GetType().InvokeMember("filein",
-																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
-																			 null,
-																			 com_obj,
-																			 new object[] {filepath});
+																   ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
+																   null,
+																   com_obj,
+																   new object[] {filepath});
 								}
 								catch (System.Reflection.TargetInvocationException) { }
 								break;
@@ -108,10 +109,10 @@ namespace MXSPyCOM
 								{
 									filepath = mxs_try_catch_errors_cmd(filepath);
 									com_obj.GetType().InvokeMember("execute",
-																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
-																			 null,
-																			 com_obj,
-																			 new object[] {filepath});
+																   ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
+																   null,
+																   com_obj,
+																   new object[] {filepath});
 								}
 								catch (System.Reflection.TargetInvocationException) { }
 								break;
@@ -120,10 +121,10 @@ namespace MXSPyCOM
 								try
 								{
 									com_obj.GetType().InvokeMember("edit",
-																			 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
-																			 null,
-																			 com_obj,
-																			 new object[] {filepath});
+																   ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
+																   null,
+																   com_obj,
+																   new object[] {filepath});
 								}
 								catch (System.Reflection.TargetInvocationException) { }
 								break;
@@ -134,10 +135,10 @@ namespace MXSPyCOM
 									try
 									{
 										com_obj.GetType().InvokeMember("encryptscript",
-																				 ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
-																				null,
-																				com_obj,
-																				new object[] {filepath});
+																	   ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
+																	   null,
+																	   com_obj,
+																	   new object[] {filepath});
 									}
 									catch (System.Reflection.TargetInvocationException) { }
 								}
