@@ -219,7 +219,7 @@ namespace MXSPyCOM
 			/// Jeff Hanna, jeff@techart.online, November 22, 2019
 
 			string mod_name = Path.GetFileNameWithoutExtension(python_filepath);
-			string reload_cmd = String.Format("try:\n\timport imp as imp\nexcept DeprecationWarning:\n\timport importlib as imp\n\ntry:\n\timp.reload({0})\nexcept:\n\tpass", mod_name);
+			string reload_cmd = String.Format("import sys\nif sys.version_info.major < 3:\n\timport imp as importlib\nelse:\n\timport importlib\n\t\ntry:\n\timportlib.reload({0})\nexcept:\n\tpass", mod_name);
 			var reload_wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "import_reload.py");
 			reload_wrapper_filepath = reload_wrapper_filepath.Replace( "\\", "\\\\");
 			System.IO.File.WriteAllText(reload_wrapper_filepath, reload_cmd);
