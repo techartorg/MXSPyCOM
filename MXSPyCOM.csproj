@@ -1,19 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <PublishTrimmed>true</PublishTrimmed>    
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <PublishTrimmed>false</PublishTrimmed>    
     <PublishSingleFile>true</PublishSingleFile>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>false</UseWPF>
     <StartupObject>MXSPyCOM.Program</StartupObject>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <Version>1.13</Version>
+    <Version>1.14</Version>
     <Authors>Jeff Hanna</Authors>
     <Company>Technical Artists Forum, Inc</Company>
-    <Copyright>Copyright © 2019, Technical Artists Forum, Inc. All rights reserved.</Copyright>
+    <Copyright>Copyright © 2021, Technical Artists Forum, Inc. All rights reserved.</Copyright>
     <PackageProjectUrl>http://www.tech-artists.org</PackageProjectUrl>
     <RepositoryUrl>https://github.com/techartorg/MXSPyCOM</RepositoryUrl>
     <Description>A modern version of MXSCOM, to allow for editing &amp; execution of 3ds Max MaxScript and Python files from external code editors.</Description>

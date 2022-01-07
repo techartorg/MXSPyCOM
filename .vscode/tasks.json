@@ -29,6 +29,7 @@
             "type": "process",
             "args": [
                 "publish",
+                "--sc",
                 "-r",
                 "win-x64",
                 "-c",
@@ -71,7 +72,7 @@
         {
             "label": "Execute Script in 3ds Max",
             "type": "shell",
-            "command": "${workspaceFolder}/bin/Release/netcoreapp3.0/win-x64/publish/MXSPyCOM.exe",                      
+            "command": "${workspaceFolder}/bin/Release/netcoreapp3.0/win-x64/publish/MXSPyCOM.exe",
             "args": [
                 "-s",
                 "${file}"
