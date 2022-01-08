@@ -21,26 +21,17 @@
                 "-c",
                 "release"
             ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Publish",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "publish",
-                "--sc",
-                "-r",
-                "win-x64",
-                "-c",
-                "release",
-                "${workspaceFolder}/MXSPyCOM.csproj"
-            ],
             "problemMatcher": "$msCompile",
             "group": {
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "publish",
+            "type": "shell",
+            "command": "scripts\\publish.ps1",
+            "problemMatcher": "$msCompile"
         },
         {
             "label": "Watch",
@@ -56,7 +47,7 @@
         {
             "label": "Execute Script in 3ds Max (Debug)",
             "type": "shell",
-            "command": "${workspaceFolder}/bin/Debug/netcoreapp3.0/MXSPyCOM.exe",
+            "command": "${workspaceFolder}/bin/Debug/net6.0-windows/win-x64/MXSPyCOM.exe",
             "args": [
                 "-s",
                 "${file}"
@@ -72,7 +63,7 @@
         {
             "label": "Execute Script in 3ds Max",
             "type": "shell",
-            "command": "${workspaceFolder}/bin/Release/netcoreapp3.0/win-x64/publish/MXSPyCOM.exe",
+            "command": "${workspaceFolder}/bin/Release/net6.0-windows/win-x64/publish/MXSPyCOM.exe",
             "args": [
                 "-s",
                 "${file}"
