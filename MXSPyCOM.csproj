@@ -13,7 +13,7 @@
     <Version>1.14</Version>
     <Authors>Jeff Hanna</Authors>
     <Company>Technical Artists Forum, Inc</Company>
-    <Copyright>Copyright © 2021, Technical Artists Forum, Inc. All rights reserved.</Copyright>
+    <Copyright>Copyright © 2022, Technical Artists Forum, Inc. All rights reserved.</Copyright>
     <PackageProjectUrl>http://www.tech-artists.org</PackageProjectUrl>
     <RepositoryUrl>https://github.com/techartorg/MXSPyCOM</RepositoryUrl>
     <Description>A modern version of MXSCOM, to allow for editing &amp; execution of 3ds Max MaxScript and Python files from external code editors.</Description>
