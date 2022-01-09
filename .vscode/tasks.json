@@ -28,7 +28,7 @@
             }
         },
         {
-            "label": "publish",
+            "label": "Publish",
             "type": "shell",
             "command": "scripts\\publish.ps1",
             "problemMatcher": "$msCompile"
