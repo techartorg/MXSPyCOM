@@ -9,15 +9,26 @@ if ($inc_ver_num -like "y") {
 
 dotnet publish "MXSPyCOM.csproj" -c Release
 
-mkdir "$env:TEMP\MXSPyCOM" -Force
-Copy-Item ".\bin\release\net6.0-windows\win-x64\publish\MXSPyCOM.exe" "$env:TEMP\MXSPyCOM"
-Copy-Item ".\README.md" "$env:TEMP\MXSPyCOM"
-Copy-Item ".\hello_world.ms" "$env:TEMP\MXSPyCOM"
-Copy-Item ".\hello_world.py" "$env:TEMP\MXSPyCOM"
-Copy-Item ".\initialize_COM_server.ms" "$env:TEMP\MXSPyCOM"
+$temp_path = Join-Path $env:TEMP "MXSPyCOM"
+mkdir $temp_path -Force
+Copy-Item "bin\release\net6.0-windows\win-x64\publish\MXSPyCOM.exe" $temp_path
+Copy-Item "README.md" $temp_path
+Copy-Item "hello_world.ms" $temp_path
+Copy-Item "hello_world.py" $temp_path
+Copy-Item "initialize_COM_server.ms" $temp_path
 
-Compress-Archive -Path "$env:TEMP\MXSPyCOM\*" -DestinationPath "$env:USERPROFILE\DESKTOP\MXSPyCOM.zip" -Force
-
-Remove-Item "$env:TEMP\MXSPyCOM" -Recurse -Force
-
-Write-Output "Include the MXSPyCOM.zip file that was written to your desktop in the new binary release on GitHub."
+$temp_filepath = Join-Path $temp_path "*"
+try {
+    # The user's desktop is in the default location on their hard drive.
+    $archive_filepath = Join-Path $env:USERPROFILE "DESKTOP" "MXSPyCOM.zip"
+    Compress-Archive -Path $temp_filepath -DestinationPath $archive_filepath -Force
+}
+catch { # It would be better if a specific Compress-Archive exception is caught, but none can be found in docs.
+    # The user's desktop is being managed by OneDrive.
+    $archive_filepath = Join-Path $env:ONEDRIVE "Desktop" "MXSPyCOM.zip"
+    Compress-Archive -Path $temp_filepath -DestinationPath $archive_filepath -Force
+}
+finally {
+   Remove-Item $temp_path -Recurse -Force
+   Write-Output "Include the MXSPyCOM.zip file that was written to your desktop in the new binary release on GitHub."
+}
