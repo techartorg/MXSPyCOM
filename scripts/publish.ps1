@@ -1,9 +1,24 @@
-$inc_ver_num = Read-Host -Prompt "Increment the version number? (Y/N)?"
-if ($inc_ver_num -like "y") {
+# Build script for MXSPyCOM.
+# MXSPyCOM.exe is built in release, with the version number incremented by 0.01, if the user requests.
+# MXSPyCOM.exe , the demonstration HelloWorld Python and MaxScript scripts, the initialize_COM_server MaxScript, and 
+# the readme.md file are archived in an MXSPyCOM.zip file and placed on the desktop, ready for including in a release
+# in the GitHub repository.
+
+[System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
+
+$inc_ver_num = [System.Windows.Forms.MessageBox]::Show(
+    "Increment the version number?", "Publish MXSPyCOM", [System.Windows.Forms.MessageBoxButtons]::YesNo)
+
+if ($inc_ver_num -like "yes") {
     [xml]$axml= Get-Content "MXSPyCOM.csproj"
     $ver_num_parts = $axml.Project.PropertyGroup.Version.Split(".")
+    $major = [int]$ver_num_parts[0]
     $minor = [int]$ver_num_parts[-1] + 1
-    $axml.Project.PropertyGroup.Version = $ver_num_parts[0] + "." + $minor.ToString()
+    if ($minor -gt 99) {
+        $major += 1
+        $minor = 00
+    }
+    $axml.Project.PropertyGroup.Version = $major.ToString() + "." + $minor.ToString()
     $axml.Save("MXSPyCOM.csproj")
 }
 
@@ -30,5 +45,10 @@ catch { # It would be better if a specific Compress-Archive exception is caught,
 }
 finally {
    Remove-Item $temp_path -Recurse -Force
-   Write-Output "Include the MXSPyCOM.zip file that was written to your desktop in the new binary release on GitHub."
+   [System.Windows.Forms.MessageBox]::Show(
+       "Finished.
+       
+Include the MXSPyCOM.zip file that was written to the desktop 
+in the new binary release on GitHub.", 
+       "Publish MXSPyCOM")
 }
