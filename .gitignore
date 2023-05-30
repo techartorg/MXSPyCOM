@@ -249,3 +249,5 @@ ModelManifest.xml
 
 # Documentation images
 images/*.*
+/Properties/launchSettings.json
+/MXSPyCOM.sln

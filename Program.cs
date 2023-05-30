@@ -41,6 +41,20 @@ namespace MXSPyCOM
 		const string USAGE_INFO = "\nType \"MXSPyCOM\" for usage info.";
 
 
+		static int Get_MaxVersion(object com_obj)
+		{
+			var com_t = com_obj.GetType();
+			var result = com_t.InvokeMember("execute", ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
+										  null,
+										  com_obj,
+										  new object[] { "MaxVersion()" });
+			if (result is object[] version_numbers)
+			{
+				return (int)version_numbers[0];
+			}
+			return 0;
+		}
+
 		static void execute_max_commands(string[] args, string filepath)
 		{
 			/// Parses the command line arguments and calls the corresponding command on Max's COM server with the provied filepath.
@@ -72,7 +86,7 @@ namespace MXSPyCOM
 			{
 				if (args.Length == 1)
 				{
-					string msg = String.Format("No options provided.", USAGE_INFO);
+					string msg = string.Format("No options provided.", USAGE_INFO);
 					show_message(msg);
 				}
 				else
@@ -81,7 +95,9 @@ namespace MXSPyCOM
 					Type com_type = Type.GetTypeFromProgID(prog_id);
 					object com_obj = Activator.CreateInstance(com_type);
 
-					string ext = System.IO.Path.GetExtension(filepath).ToLower();
+					string ext = Path.GetExtension(filepath).ToLower();
+
+					var version = Get_MaxVersion(com_obj);
 
 					foreach (string arg in args)
 					{
@@ -99,22 +115,22 @@ namespace MXSPyCOM
 																   ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
 																   null,
 																   com_obj,
-																   new object[] {filepath});
+																   new object[] { filepath });
 								}
-								catch (System.Reflection.TargetInvocationException) { }
+								catch (TargetInvocationException) { }
 								break;
 
 							case "-s":
 								try
 								{
-									filepath = mxs_try_catch_errors_cmd(filepath);
+									filepath = mxs_try_catch_errors_cmd(filepath, version);
 									com_obj.GetType().InvokeMember("execute",
 																   ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
 																   null,
 																   com_obj,
-																   new object[] {filepath});
+																   new object[] { filepath });
 								}
-								catch (System.Reflection.TargetInvocationException) { }
+								catch (TargetInvocationException) { }
 								break;
 
 							case "-e":
@@ -124,9 +140,9 @@ namespace MXSPyCOM
 																   ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
 																   null,
 																   com_obj,
-																   new object[] {filepath});
+																   new object[] { filepath });
 								}
-								catch (System.Reflection.TargetInvocationException) { }
+								catch (TargetInvocationException) { }
 								break;
 
 							case "-c":
@@ -138,13 +154,13 @@ namespace MXSPyCOM
 																	   ReflectionUtils.MemberAccess | BindingFlags.InvokeMethod,
 																	   null,
 																	   com_obj,
-																	   new object[] {filepath});
+																	   new object[] { filepath });
 									}
-									catch (System.Reflection.TargetInvocationException) { }
+									catch (TargetInvocationException) { }
 								}
 								else
 								{
-									string msg = String.Format("Only MaxScript files can be encrypted. {0}", USAGE_INFO);
+									string msg = $"Only MaxScript files can be encrypted. {USAGE_INFO}";
 									show_message(msg);
 								}
 								break;
@@ -219,10 +235,10 @@ namespace MXSPyCOM
 			/// Jeff Hanna, jeff@techart.online, November 22, 2019
 
 			string mod_name = Path.GetFileNameWithoutExtension(python_filepath);
-			string reload_cmd = String.Format("import sys\nif sys.version_info.major < 3:\n\timport imp as importlib\nelse:\n\timport importlib\n\t\ntry:\n\timportlib.reload({0})\nexcept:\n\tpass", mod_name);
-			var reload_wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "import_reload.py");
-			reload_wrapper_filepath = reload_wrapper_filepath.Replace( "\\", "\\\\");
-			System.IO.File.WriteAllText(reload_wrapper_filepath, reload_cmd);
+			string reload_cmd = $"import sys\nif sys.version_info.major < 3:\n\timport imp as importlib\nelse:\n\timport importlib\n\t\ntry:\n\timportlib.reload({mod_name})\nexcept:\n\tpass";
+			var reload_wrapper_filepath = Path.Combine(Path.GetTempPath(), "import_reload.py");
+			reload_wrapper_filepath = reload_wrapper_filepath.Replace(@"\", @"\\");
+			File.WriteAllText(reload_wrapper_filepath, reload_cmd);
 
 			return reload_wrapper_filepath;
 		}
@@ -250,16 +266,16 @@ namespace MXSPyCOM
 			///
 			/// Jeff Hanna, jeff@techart.online, July 9, 2016
 
-			string reload_filepath = make_python_import_reload_wrapper( python_filepath );
-			string cmd = String.Format("python.ExecuteFile(\"{0}\");python.ExecuteFile(\"{1}\")", reload_filepath, python_filepath);
-			var wrapper_filepath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "maxscript_python_wrapper.ms");
-			System.IO.File.WriteAllText(wrapper_filepath, cmd);
+			string reload_filepath = make_python_import_reload_wrapper(python_filepath);
+			string cmd = $"python.ExecuteFile(\"{reload_filepath}\");python.ExecuteFile(\"{python_filepath}\")";
+			var wrapper_filepath = Path.Combine(Path.GetTempPath(), "maxscript_python_wrapper.ms");
+			File.WriteAllText(wrapper_filepath, cmd);
 
 			return wrapper_filepath;
 		}
 
 
-		static string mxs_try_catch_errors_cmd(string filepath)
+		static string mxs_try_catch_errors_cmd(string filepath, int version)
 		{
 			/// Wraps the given MAXScript command arg in MAXScript code that when run in 3ds Max will catch
 			/// errors using a MAXScript try() catch() and print a 'homemade' minimally useful log message
@@ -282,36 +298,45 @@ namespace MXSPyCOM
 			///
 			/// Gary Tyler, mail@garytyler.com, April 12, 2018
 
-			string ext = System.IO.Path.GetExtension(filepath).ToLower();
+			string ext = Path.GetExtension(filepath).ToLower();
 
 			string location;
-			string run_cmd;
-
+			string run_cmd;            
+			
 			if (ext == ".py")
 			{
 				/// For python files, use passed filepath for location msg, no pos or line available
-				location = String.Format("\"Error; filename: {0}\"", filepath);
+				location = $"\"Error; filename: {filepath}\"";
 
 				/// Pass thru python.ExecuteFile()
-				string reload_filepath = make_python_import_reload_wrapper( filepath );
-				run_cmd = String.Format("python.ExecuteFile(\"{0}\");python.ExecuteFile(\"{1}\")", reload_filepath, filepath);
+				string reload_filepath = make_python_import_reload_wrapper(filepath);
+				run_cmd = $"python.ExecuteFile(\"{reload_filepath}\");python.ExecuteFile(\"{filepath}\")";
 			}
 			else
-			{
-				/// For maxscript files, use provided commands for location msg
-				string loc_file = "\" filename: \" + (getErrorSourceFileName() as string)";
-				string loc_pos = "\"; position: \" + ((getErrorSourceFileOffset() as integer) as string)";
-				string loc_line = "\"; line: \" + ((getErrorSourceFileLine() as integer) as string) + \"\n\"";
-				string callstack_line = "\"callstack: \n\" + (cs as string)";
-				location = String.Format("\"Error;\" + {0} + {1} + {2} + {3}", loc_file, loc_pos, loc_line, callstack_line);
+			{                                
+				if (version > 19000 || version == 0)
+				{
+					/// For maxscript files, use provided commands for location msg
+					string loc_file = "\" filename: \" + (getErrorSourceFileName() as string)";
+					string loc_pos = "\"; position: \" + ((getErrorSourceFileOffset() as integer) as string)";
+					string loc_line = "\"; line: \" + ((getErrorSourceFileLine() as integer) as string) + \"\n\"";
+					string callstack_line = "\"callstack: \n\" + (cs as string)";
+					location = $"#(\"Error;\" + {loc_file} + {loc_pos} + {loc_line} + {callstack_line})";
+				}
+				else
+				{
+					string loc_file = "\" filename: \" + (getSourceFileName() as string) + \"\n\"";
+					string callstack_line = "\"callstack: \n\" + getCurrentExceptionStackTrace()";
+					location = $"#(\"Error;\" + {loc_file} + {callstack_line} + \"-- ########################################################################\n\" + getCurrentExceptionCallStack() + \"-- ########################################################################\n\")";                    
+				}
 
 				/// Pass thru filein()
-				run_cmd = String.Format("filein(@\"{0}\")", filepath);
+				run_cmd = $"filein(@\"{filepath}\")";
 			}
 
 			string exception_array = "(filterString (getCurrentException()) \"\n\")";
-			string exception_msg = String.Format("(for i in #({0}) + {1} do setListenerSelText (\"\n\" + i))", location, exception_array);
-			string cmd = String.Format("try({0}) catch(cs = \"\" as stringStream;stack to:cs;{1});setListenerSelText \"\n\"", run_cmd, exception_msg);
+			string exception_msg = $"(for i in {exception_array} + {location} do setListenerSelText (\"\n\" + i))";
+			string cmd = $"try({run_cmd}) catch(cs = \"\" as stringStream;stack to:cs;{exception_msg});setListenerSelText \"\n\"";
 			return cmd;
 		}
 
@@ -391,16 +416,16 @@ Commands:
 			string filepath = args[args.Length - 1];
 			if (filepath.StartsWith("-"))
 			{
-				string msg = String.Format("No script filepath provided. {0}", USAGE_INFO);
+				string msg = $"No script filepath provided. {USAGE_INFO}";
 				show_message(msg);
 			}
-			else if (!System.IO.File.Exists(filepath))
+			else if (!File.Exists(filepath))
 			{
-				string msg = String.Format("The specified script file does not exist on disk. {0}", USAGE_INFO);
+				string msg = $"The specified script file does not exist on disk. {USAGE_INFO}";
 				show_message(msg);
 			}
 
-			filepath = filepath.Replace("\\", "\\\\");
+			filepath = filepath.Replace(@"\", @"\\");
 			return filepath;
 		}
 
